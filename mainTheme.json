@@ -1,0 +1,22 @@
+{
+    "defaults":
+    {
+        "colours":
+        {
+            "normal_bg":"#a723cf",
+            "hovered_bg":"#35393e",
+            "disabled_bg":"#ffffff",
+            "selected_bg":"#193754",
+            "dark_bg":"#15191e",
+
+
+            "normal_border": "#45494e",
+            "hovered_border": "#35393e",
+            "disabled_border": "#25292e",
+            "selected_border": "#193754",
+            "active_border": "#15191e",
+            "filled_bar":"#f4251b",
+            "unfilled_bar":"#CCCCCC"
+        }
+    }
+}
