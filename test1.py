@@ -19,6 +19,8 @@ hello_button = pygame_gui.elements.UIButton(relative_rect=pygame.Rect((600, 275)
 clock = pygame.time.Clock()
 is_running = True
 
+hello_button._on_contents_changed
+
 while is_running:
     time_delta = clock.tick(60)/1000.0
     for event in pygame.event.get():
