@@ -1,15 +1,16 @@
+import ntcore
 import pygame
-import pygame_gui
-from GUI import GUI
+from gui import GUI
 
 
 pygame.init()
 
 pygame.display.set_caption('Quick Start')
 window_surface = pygame.display.set_mode((800, 600))
-
-gui = GUI(None, window_surface)
-
+table:ntcore.NetworkTableInstance = ntcore.NetworkTableInstance.getDefault()
+##table.setServerTeam(1799)
+table.setServer("127.0.0.1")
+gui = GUI(table, window_surface) 
 isRunning=True
 while isRunning:
     

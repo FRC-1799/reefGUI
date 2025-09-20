@@ -19,15 +19,24 @@ class GUI:
 
 
 
-    def __init__(self, table:NetworkTableInstance, drawSurface = pygame.display.set_mode((800, 600))):
+    def __init__(self, table:NetworkTableInstance, drawSurface:Surface = pygame.display.set_mode((800, 600))):
         if table:
             self.table=table
-            self.l1Publisher = table.getBooleanArrayTopic("CoralL1").publish()
-            self.l2Publisher = table.getBooleanArrayTopic("CoralL2").publish()
-            self.l3Publisher = table.getBooleanArrayTopic("CoralL3").publish()
-            self.l4Publisher = table.getBooleanArrayTopic("CoralL4").publish()
+            self.l1Publisher = table.getBooleanArrayTopic("GUI/CoralL1").publish()
+            self.l2Publisher = table.getBooleanArrayTopic("GUI/CoralL2").publish()
+            self.l3Publisher = table.getBooleanArrayTopic("GUI/CoralL3").publish()
+            self.l4Publisher = table.getBooleanArrayTopic("GUI/CoralL4").publish()
+
+            self.l1Getter = table.getBooleanArrayTopic("CoralL1").publish()
+            self.l2Getter = table.getBooleanArrayTopic("CoralL2").publish()
+            self.l3Getter = table.getBooleanArrayTopic("CoralL3").publish()
+            self.l4Getter = table.getBooleanArrayTopic("CoralL4").publish()
+
+
+
             self.leftIntakePublisher = table.getBooleanArrayTopic("leftIntake").publish()
             self.rightIntakePublisher = table.getBooleanArrayTopic("rightIntake").publish()
+
 
         self.clock = pygame.time.Clock()
 
@@ -36,7 +45,10 @@ class GUI:
         self.background = pygame.Surface((800, 600))
         self.background.fill(pygame.Color('#666666'))
 
-        self.buttons=[]
+
+        
+
+        self.buttons:list[list[pygame_gui.elements.UIButton]]=[]
         self.manager = pygame_gui.UIManager((800, 600), "mainTheme.json")
 
         for pole in range(12):
@@ -79,9 +91,10 @@ class GUI:
                 element:UIButton = event.ui_element
                 if element.is_selected:
                     element.unselect()
+                    
                 else:
                     element.select()
-                    element.bind()
+                    #element.bind()
 
             self.manager.process_events(event)
 
@@ -90,8 +103,22 @@ class GUI:
         self.drawSurface.blit(self.background, (0, 0))
         self.manager.draw_ui(self.drawSurface)
 
+        toPublish:list[list[bool]] =[[],[],[],[]]
+        
+        for pole in self.buttons:
+            level=0
+            for button in pole:
+                toPublish[level].append(button.is_selected)
+                level+=1
+
+
+        self.l1Publisher.set(toPublish[0]) # type: ignore
+        self.l2Publisher.set(toPublish[1]) # type: ignore
+        self.l3Publisher.set(toPublish[2]) # type: ignore
+        self.l4Publisher.set(toPublish[3]) # type: ignore
+
         pygame.display.update()
         pygame.event.pump()
         
 
-
+    
