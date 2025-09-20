@@ -1,8 +1,9 @@
-from ntcore import NetworkTableInstance
 from pygame import Surface
 import pygame
 import pygame_gui
 from pygame_gui.elements.ui_button import UIButton
+
+from guiNTManager import guiNTManager
 
 
 class GUI:
@@ -19,24 +20,8 @@ class GUI:
 
 
 
-    def __init__(self, table:NetworkTableInstance, drawSurface:Surface = pygame.display.set_mode((800, 600))):
-        if table:
-            self.table=table
-            self.l1Publisher = table.getBooleanArrayTopic("GUI/CoralL1").publish()
-            self.l2Publisher = table.getBooleanArrayTopic("GUI/CoralL2").publish()
-            self.l3Publisher = table.getBooleanArrayTopic("GUI/CoralL3").publish()
-            self.l4Publisher = table.getBooleanArrayTopic("GUI/CoralL4").publish()
-
-            self.l1Getter = table.getBooleanArrayTopic("CoralL1").publish()
-            self.l2Getter = table.getBooleanArrayTopic("CoralL2").publish()
-            self.l3Getter = table.getBooleanArrayTopic("CoralL3").publish()
-            self.l4Getter = table.getBooleanArrayTopic("CoralL4").publish()
-
-
-
-            self.leftIntakePublisher = table.getBooleanArrayTopic("leftIntake").publish()
-            self.rightIntakePublisher = table.getBooleanArrayTopic("rightIntake").publish()
-
+    def __init__(self, teamNumber:int = 1799, drawSurface:Surface = pygame.display.set_mode((800, 600))):
+        self.publisher:guiNTManager = guiNTManager(teamNumber)
 
         self.clock = pygame.time.Clock()
 
@@ -103,19 +88,18 @@ class GUI:
         self.drawSurface.blit(self.background, (0, 0))
         self.manager.draw_ui(self.drawSurface)
 
-        toPublish:list[list[bool]] =[[],[],[],[]]
         
-        for pole in self.buttons:
-            level=0
-            for button in pole:
-                toPublish[level].append(button.is_selected)
-                level+=1
 
+        if self.publisher.isConnected():
+            toPublish:list[list[bool]] =[[],[],[],[]]
 
-        self.l1Publisher.set(toPublish[0]) # type: ignore
-        self.l2Publisher.set(toPublish[1]) # type: ignore
-        self.l3Publisher.set(toPublish[2]) # type: ignore
-        self.l4Publisher.set(toPublish[3]) # type: ignore
+            for pole in self.buttons:
+                level=0
+                for button in pole:
+                    toPublish[level].append(button.is_selected)
+                    level+=1
+
+            self.publisher.publishReef(toPublish)
 
         pygame.display.update()
         pygame.event.pump()

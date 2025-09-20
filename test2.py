@@ -10,7 +10,7 @@ window_surface = pygame.display.set_mode((800, 600))
 table:ntcore.NetworkTableInstance = ntcore.NetworkTableInstance.getDefault()
 ##table.setServerTeam(1799)
 table.setServer("127.0.0.1")
-gui = GUI(table, window_surface) 
+gui = GUI( drawSurface=window_surface) 
 isRunning=True
 while isRunning:
     
