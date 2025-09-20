@@ -22,20 +22,20 @@ class guiNTManager:
 
         
 
-        self.l1Publisher:BooleanArrayPublisher = self.table.getBooleanArrayTopic("GUI/CoralL1").publish()
-        self.l2Publisher:BooleanArrayPublisher = self.table.getBooleanArrayTopic("GUI/CoralL2").publish()
-        self.l3Publisher:BooleanArrayPublisher = self.table.getBooleanArrayTopic("GUI/CoralL3").publish()
-        self.l4Publisher:BooleanArrayPublisher = self.table.getBooleanArrayTopic("GUI/CoralL4").publish()
+        self.l1Publisher:BooleanArrayPublisher = self.publisher.getBooleanArrayTopic("GUI/CoralL1").publish()
+        self.l2Publisher:BooleanArrayPublisher = self.publisher.getBooleanArrayTopic("GUI/CoralL2").publish()
+        self.l3Publisher:BooleanArrayPublisher = self.publisher.getBooleanArrayTopic("GUI/CoralL3").publish()
+        self.l4Publisher:BooleanArrayPublisher = self.publisher.getBooleanArrayTopic("GUI/CoralL4").publish()
 
-        self.l1Getter:BooleanArraySubscriber = self.table.getBooleanArrayTopic("CoralL1").subscribe([])
-        self.l2Getter:BooleanArraySubscriber = self.table.getBooleanArrayTopic("CoralL2").subscribe([])
-        self.l3Getter:BooleanArraySubscriber = self.table.getBooleanArrayTopic("CoralL3").subscribe([])
-        self.l4Getter:BooleanArraySubscriber = self.table.getBooleanArrayTopic("CoralL4").subscribe([])
+        self.l1Getter:BooleanArraySubscriber = self.publisher.getBooleanArrayTopic("CoralL1").subscribe([])
+        self.l2Getter:BooleanArraySubscriber = self.publisher.getBooleanArrayTopic("CoralL2").subscribe([])
+        self.l3Getter:BooleanArraySubscriber = self.publisher.getBooleanArrayTopic("CoralL3").subscribe([])
+        self.l4Getter:BooleanArraySubscriber = self.publisher.getBooleanArrayTopic("CoralL4").subscribe([])
 
 
 
-        self.leftIntakePublisher:BooleanArrayPublisher = self.table.getBooleanArrayTopic("leftIntake").publish()
-        self.rightIntakePublisher:BooleanArrayPublisher = self.table.getBooleanArrayTopic("rightIntake").publish()
+        self.leftIntakePublisher:BooleanArrayPublisher = self.publisher.getBooleanArrayTopic("GUI/leftIntake").publish()
+        self.rightIntakePublisher:BooleanArrayPublisher = self.publisher.getBooleanArrayTopic("GUI/rightIntake").publish()
 
     def connect(self, port:str=None, teamNumber:int=None, name="lidar", startAsServer=False, saveConnectionIfSuccessful=True)->bool: # type: ignore
         connecter:ntcore.NetworkTableInstance = ntcore.NetworkTableInstance.getDefault()
@@ -65,18 +65,18 @@ class guiNTManager:
 
     def connectionTester(self):
         while True:
-            if self.teamNumber!=0:        
-                if self.connect(teamNumber=self.teamNumber) or self.connect(port="127.0.0.1"):
-                    break
-            else:
-                if self.connect(port="127.0.0.1"):
-                    break
+            if not self.isConnected():
+                if self.teamNumber!=0:        
+                    if self.connect(teamNumber=self.teamNumber) or self.connect(port="127.0.0.1"):
+                        print("Connected to", self.teamNumber)
+                else:
+                    if self.connect(port="127.0.0.1"):
+                        print("Connected to sim")
 
             time.sleep(4)
-        print("Connected on port", self.publisher.getConnections()[0].remote_ip)
                 
     def isConnected(self)->bool:
-        return self.table and self.table.isConnected()
+        return self.publisher!=None and self.publisher.isConnected()
 
     def publishReef(self, reef:list[list[bool]]):
         self.l1Publisher.set(reef[0]) # type: ignore
@@ -91,3 +91,7 @@ class guiNTManager:
             self.l3Getter.get(),
             self.l4Getter.get(),
         ] # type: ignore
+    
+    def publishIntake(self, leftIntake:list[bool], rightIntake:list[bool]):
+        self.leftIntakePublisher.set(leftIntake) # type: ignore
+        self.rightIntakePublisher.set(rightIntake) # type: ignore

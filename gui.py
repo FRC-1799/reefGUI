@@ -1,3 +1,4 @@
+from ntcore import Publisher
 from pygame import Surface
 import pygame
 import pygame_gui
@@ -11,12 +12,19 @@ class GUI:
     
     buttonWidth=30
     buttonHeight=50
+
+    intakeDisplayWidth=40
+    intakeDisplayHeight=40
+
     buttonPadding=5
     canvasRightSide=130
     canvasTopSide=200
     downOffset = 20
     downOffsetIDS={2,3,8,9}
     centerOffset = 50
+
+    intakeHeight = 550
+    intakePoses = [50, 100, 150, 650, 700, 750]
 
 
 
@@ -30,7 +38,7 @@ class GUI:
         self.background = pygame.Surface((800, 600))
         self.background.fill(pygame.Color('#666666'))
 
-
+        self.intakeButtons:list[pygame_gui.elements.UIButton]=[]
         
 
         self.buttons:list[list[pygame_gui.elements.UIButton]]=[]
@@ -61,9 +69,13 @@ class GUI:
 
 
         
-        self.hello_button = pygame_gui.elements.UIButton(relative_rect=pygame.Rect((600, 275), (0, 0)),
-                                            text='Say Hello',
-                                            manager=self.manager)
+        for width in GUI.intakePoses:
+            self.intakeButtons.append(
+                    pygame_gui.elements.UIButton(relative_rect=pygame.Rect(
+                        ((width, self.intakeHeight)), 
+                        (GUI.intakeDisplayWidth, GUI.intakeDisplayHeight)),
+                    text='',
+                    manager=self.manager))
 
 
     def periodic(self):
@@ -88,18 +100,28 @@ class GUI:
         self.drawSurface.blit(self.background, (0, 0))
         self.manager.draw_ui(self.drawSurface)
 
-        
-
         if self.publisher.isConnected():
             toPublish:list[list[bool]] =[[],[],[],[]]
 
             for pole in self.buttons:
-                level=0
+                level=3
                 for button in pole:
                     toPublish[level].append(button.is_selected)
-                    level+=1
-
+                    level-=1
             self.publisher.publishReef(toPublish)
+
+            leftIntake:list[bool] =[]
+            rightIntake:list[bool]=[]
+
+            for intake in range(0, 3):
+                leftIntake.append(self.intakeButtons[intake].is_selected)
+                rightIntake.append(self.intakeButtons[intake+3].is_selected)
+
+            self.publisher.publishIntake(leftIntake, rightIntake)
+        
+
+        pygame.draw.rect(self.background, (0, 255,0) if self.publisher.isConnected() else (255, 0, 0), (400, 100, 20, 20), 0) 
+
 
         pygame.display.update()
         pygame.event.pump()
