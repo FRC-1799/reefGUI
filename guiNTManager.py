@@ -27,10 +27,10 @@ class guiNTManager:
         self.l3Publisher:BooleanArrayPublisher = self.publisher.getBooleanArrayTopic("GUI/CoralL3").publish()
         self.l4Publisher:BooleanArrayPublisher = self.publisher.getBooleanArrayTopic("GUI/CoralL4").publish()
 
-        self.l1Getter:BooleanArraySubscriber = self.publisher.getBooleanArrayTopic("CoralL1").subscribe([])
-        self.l2Getter:BooleanArraySubscriber = self.publisher.getBooleanArrayTopic("CoralL2").subscribe([])
-        self.l3Getter:BooleanArraySubscriber = self.publisher.getBooleanArrayTopic("CoralL3").subscribe([])
-        self.l4Getter:BooleanArraySubscriber = self.publisher.getBooleanArrayTopic("CoralL4").subscribe([])
+        self.l1Getter:BooleanArraySubscriber = self.publisher.getBooleanArrayTopic("CoralPositions/ReefL1").subscribe([])
+        self.l2Getter:BooleanArraySubscriber = self.publisher.getBooleanArrayTopic("CoralPositions/ReefL1").subscribe([])
+        self.l3Getter:BooleanArraySubscriber = self.publisher.getBooleanArrayTopic("CoralPositions/ReefL1").subscribe([])
+        self.l4Getter:BooleanArraySubscriber = self.publisher.getBooleanArrayTopic("CoralPositions/ReefL1").subscribe([])
 
 
 

@@ -24,6 +24,11 @@ class GUI:
     centerOffset = 50
 
     intakeHeight = 550
+
+    selectAllHight = 500
+    selectAllSide=20
+
+
     intakePoses = [50, 100, 150, 650, 700, 750]
 
 
@@ -41,11 +46,18 @@ class GUI:
         self.intakeButtons:list[pygame_gui.elements.UIButton]=[]
         
 
+        self.selectPoleButtons:list[pygame_gui.elements.UIButton]=[]
+
         self.buttons:list[list[pygame_gui.elements.UIButton]]=[]
         self.manager = pygame_gui.UIManager((800, 600), "mainTheme.json")
 
         for pole in range(12):
             self.buttons.append([])
+            self.selectPoleButtons.append(pygame_gui.elements.UIButton(relative_rect=pygame.Rect(
+                        (((pole+1)*(GUI.buttonWidth+GUI.buttonPadding)+GUI.canvasRightSide+(GUI.centerOffset if pole>5 else 0), GUI.selectAllHight)), 
+                        (GUI.selectAllSide, GUI.selectAllSide)),
+                    text='',
+                    manager=self.manager))
             for level in range(4):
                 if pole in GUI.downOffsetIDS:
                     downBonus=GUI.downOffset
@@ -101,6 +113,27 @@ class GUI:
         self.manager.draw_ui(self.drawSurface)
 
         if self.publisher.isConnected():
+
+            poleID=0
+            for selectButton in self.selectPoleButtons:
+                if selectButton.is_selected:
+                    shouldUnselectButton=True
+                    for button in self.buttons[poleID]:
+                        if not button.is_selected:
+                            shouldUnselectButton=False
+                            break
+
+                    for button in self.buttons[poleID]:
+                        if shouldUnselectButton:
+                            button.unselect()
+                        else:
+                            button.select()
+
+                selectButton.unselect()
+                poleID+=1
+
+
+
             toPublish:list[list[bool]] =[[],[],[],[]]
 
             for pole in self.buttons:
@@ -109,6 +142,9 @@ class GUI:
                     toPublish[level].append(button.is_selected)
                     level-=1
             self.publisher.publishReef(toPublish)
+
+
+
 
             leftIntake:list[bool] =[]
             rightIntake:list[bool]=[]
