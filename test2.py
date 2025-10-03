@@ -6,7 +6,7 @@ from gui import GUI
 pygame.init()
 
 pygame.display.set_caption('Quick Start')
-window_surface = pygame.display.set_mode((800, 600))
+window_surface = pygame.display.set_mode((GUI.canvasWidth, GUI.canvasHeight))
 table:ntcore.NetworkTableInstance = ntcore.NetworkTableInstance.getDefault()
 ##table.setServerTeam(1799)
 table.setServer("127.0.0.1")
