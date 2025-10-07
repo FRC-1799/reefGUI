@@ -3,6 +3,7 @@ from pygame import Surface
 import pygame
 import pygame_gui
 from pygame_gui.elements.ui_button import UIButton
+from pygame_gui.core import ObjectID
 
 from guiNTManager import guiNTManager
 
@@ -16,18 +17,21 @@ class GUI:
     intakeDisplayWidth=40
     intakeDisplayHeight=40
 
-    buttonPadding=5
+    algaeDisplayHight=20
+    algaeDisplayWidth=20
+
+    buttonPadding=15
     canvasRightSide=130
     canvasTopSide=70
 
-    reefBottomHalfOffset=220
+    reefBottomHalfOffset=250
 
-    downOffset = 20
+    downOffset = 10
     downOffsetIDS=[0,1,6,7]
     centerOffset = 50
 
     canvasWidth=800
-    canvasHeight=600
+    canvasHeight=640
 
     intakeHeight = 550
 
@@ -115,6 +119,34 @@ class GUI:
                         (GUI.intakeDisplayWidth, GUI.intakeDisplayHeight)),
                     text='',
                     manager=self.manager))
+            
+
+        self.algaeButtons:list[list[pygame_gui.elements.UIButton]]=[]
+        for level in range(2):
+            self.algaeButtons.append([])
+            for side in range(6):
+
+
+                positionalIndex = GUI.poleOrder.index(side*2 + (1 if side in [2, 3, 4] else 0))
+
+                buttonX = (((positionalIndex)%6)-3) * (GUI.buttonWidth+GUI.buttonPadding) + GUI.buttonWidth + (GUI.buttonPadding - GUI.algaeDisplayWidth)/2 + GUI.canvasWidth/2
+
+                buttonY= (
+                    GUI.canvasTopSide + 
+                    (GUI.reefBottomHalfOffset if positionalIndex<6 else 0) 
+                    + (1.5 + level)*(GUI.buttonHeight+GUI.buttonPadding) + GUI.buttonPadding 
+                    +((GUI.downOffset if (GUI.downOffsetIDS.__contains__(side*2)) else 0) * (1 if positionalIndex<5 else -1))
+                )
+
+                self.algaeButtons[level].append(
+                    pygame_gui.elements.UIButton(relative_rect=pygame.Rect(
+                        ((buttonX, buttonY)), 
+                        (GUI.algaeDisplayWidth, GUI.algaeDisplayHight)),
+                    text='',
+                    object_id=ObjectID(class_id='algae'),
+                    manager=self.manager))
+                
+                
 
 
     def periodic(self):
@@ -194,7 +226,15 @@ class GUI:
                 rightIntake.append(not self.intakeButtons[intake+3].is_selected)
 
             self.publisher.publishIntake(leftIntake, rightIntake)
-        
+
+            algaeVals:list[list[bool]]=[[],[]]
+            for side in range(6):
+                algaeVals[0].append(self.algaeButtons[0][side].is_selected)
+                algaeVals[1].append(self.algaeButtons[1][side].is_selected)
+
+
+            self.publisher.publishAlgae(algaeVals)
+
 
         pygame.draw.rect(self.background, (0, 255,0) if self.publisher.isConnected() else (255, 0, 0), (GUI.isConnectedX, GUI.isConnectedY, GUI.isConnectedSideLen, GUI.isConnectedSideLen), 0) 
 

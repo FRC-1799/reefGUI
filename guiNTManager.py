@@ -27,6 +27,10 @@ class guiNTManager:
         self.l3Publisher:BooleanArrayPublisher = self.publisher.getBooleanArrayTopic("GUI/CoralL3").publish()
         self.l4Publisher:BooleanArrayPublisher = self.publisher.getBooleanArrayTopic("GUI/CoralL4").publish()
 
+        self.algaeL1:BooleanArrayPublisher = self.publisher.getBooleanArrayTopic("GUI/AlgaeL1").publish()
+        self.algaeL2:BooleanArrayPublisher = self.publisher.getBooleanArrayTopic("GUI/AlgaeL2").publish()
+        
+
         self.l1Getter:BooleanArraySubscriber = self.publisher.getBooleanArrayTopic("CoralPositions/ReefL1").subscribe(default) # type: ignore
         self.l2Getter:BooleanArraySubscriber = self.publisher.getBooleanArrayTopic("CoralPositions/ReefL1").subscribe(default) # type: ignore
         self.l3Getter:BooleanArraySubscriber = self.publisher.getBooleanArrayTopic("CoralPositions/ReefL1").subscribe(default) # type: ignore
@@ -95,3 +99,8 @@ class guiNTManager:
     def publishIntake(self, leftIntake:list[bool], rightIntake:list[bool]):
         self.leftIntakePublisher.set(leftIntake) # type: ignore
         self.rightIntakePublisher.set(rightIntake) # type: ignore
+
+    def publishAlgae(self, algae:list[list[bool]]):
+        self.algaeL1.set(algae[0]) # type: ignore
+        self.algaeL2.set(algae[1]) # type: ignore
+    
