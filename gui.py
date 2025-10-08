@@ -61,6 +61,7 @@ class GUI:
 
         self.intakeButtons:list[pygame_gui.elements.UIButton]=[]
         
+        self.lastPublishedAlgaeValues=[[False, False, False, False, False, False], [False, False, False, False, False, False]]
 
         self.selectPoleButtons:list[pygame_gui.elements.UIButton]=[]
 
@@ -211,7 +212,7 @@ class GUI:
                     if self.publisher.getReef()[level][poleID]:
                         button.disable()
                     elif not button.is_enabled:
-                        button.enable
+                        button.enable()
 
             self.publisher.publishReef(toPublish)
 
@@ -227,12 +228,20 @@ class GUI:
 
             self.publisher.publishIntake(leftIntake, rightIntake)
 
+            NTAlgaeVals:list[list[bool]] = self.publisher.getAlgae()
+            for level in range(2):
+                for row in range(6):
+                    if NTAlgaeVals[level][row] != self.lastPublishedAlgaeValues[level][row]:
+                        self.algaeButtons[level][row].select() if NTAlgaeVals[level][row] else self.algaeButtons[level][row].unselect()
+
+            
+
             algaeVals:list[list[bool]]=[[],[]]
             for side in range(6):
                 algaeVals[0].append(self.algaeButtons[0][side].is_selected)
                 algaeVals[1].append(self.algaeButtons[1][side].is_selected)
 
-
+            self.lastPublishedAlgaeValues=algaeVals
             self.publisher.publishAlgae(algaeVals)
 
 

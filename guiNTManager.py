@@ -27,21 +27,26 @@ class guiNTManager:
         self.l3Publisher:BooleanArrayPublisher = self.publisher.getBooleanArrayTopic("GUI/CoralL3").publish()
         self.l4Publisher:BooleanArrayPublisher = self.publisher.getBooleanArrayTopic("GUI/CoralL4").publish()
 
-        self.algaeL1:BooleanArrayPublisher = self.publisher.getBooleanArrayTopic("GUI/AlgaeL1").publish()
-        self.algaeL2:BooleanArrayPublisher = self.publisher.getBooleanArrayTopic("GUI/AlgaeL2").publish()
+        self.algaeL1Publisher:BooleanArrayPublisher = self.publisher.getBooleanArrayTopic("GUI/AlgaeL1").publish()
+        self.algaeL2Publisher:BooleanArrayPublisher = self.publisher.getBooleanArrayTopic("GUI/AlgaeL2").publish()
+        self.algaeL1Subscriber:BooleanArraySubscriber = self.publisher.getBooleanArrayTopic("GUI/AlgaeL1").subscribe([False, False, False, False, False, False])
+        self.algaeL2Subscriber:BooleanArraySubscriber = self.publisher.getBooleanArrayTopic("GUI/AlgaeL2").subscribe([False, False, False, False, False, False]) 
+
         
 
-        self.l1Getter:BooleanArraySubscriber = self.publisher.getBooleanArrayTopic("CoralPositions/ReefL1").subscribe(default) # type: ignore
-        self.l2Getter:BooleanArraySubscriber = self.publisher.getBooleanArrayTopic("CoralPositions/ReefL1").subscribe(default) # type: ignore
-        self.l3Getter:BooleanArraySubscriber = self.publisher.getBooleanArrayTopic("CoralPositions/ReefL1").subscribe(default) # type: ignore
-        self.l4Getter:BooleanArraySubscriber = self.publisher.getBooleanArrayTopic("CoralPositions/ReefL1").subscribe(default) # type: ignore
+        self.l1CoralGetter:BooleanArraySubscriber = self.publisher.getBooleanArrayTopic("CoralPositions/ReefL1").subscribe(default) # type: ignore
+        self.l2CoralGetter:BooleanArraySubscriber = self.publisher.getBooleanArrayTopic("CoralPositions/ReefL1").subscribe(default) # type: ignore
+        self.l3CoralGetter:BooleanArraySubscriber = self.publisher.getBooleanArrayTopic("CoralPositions/ReefL1").subscribe(default) # type: ignore
+        self.l4CoralGetter:BooleanArraySubscriber = self.publisher.getBooleanArrayTopic("CoralPositions/ReefL1").subscribe(default) # type: ignore
 
-
+        
 
         self.leftIntakePublisher:BooleanArrayPublisher = self.publisher.getBooleanArrayTopic("GUI/leftIntake").publish()
         self.rightIntakePublisher:BooleanArrayPublisher = self.publisher.getBooleanArrayTopic("GUI/rightIntake").publish()
 
-    def connect(self, port:str=None, teamNumber:int=None, name="lidar", startAsServer=False, saveConnectionIfSuccessful=True)->bool: # type: ignore
+    
+
+    def connect(self, port:str=None, teamNumber:int=None, name="reefGUI", startAsServer=False, saveConnectionIfSuccessful=True)->bool: # type: ignore
         connecter:ntcore.NetworkTableInstance = ntcore.NetworkTableInstance.getDefault()
         if port == teamNumber: # type: ignore
             raise ValueError("Must give a team number or a port when trying to connect to network tables. values given were port:", port,". TeamNumber:", teamNumber)
@@ -90,10 +95,10 @@ class guiNTManager:
 
     def getReef(self)->list[list[bool]]:
         return [
-            self.l1Getter.get(), 
-            self.l2Getter.get(),
-            self.l3Getter.get(),
-            self.l4Getter.get(),
+            self.l1CoralGetter.get(), 
+            self.l2CoralGetter.get(),
+            self.l3CoralGetter.get(),
+            self.l4CoralGetter.get(),
         ] # type: ignore
     
     def publishIntake(self, leftIntake:list[bool], rightIntake:list[bool]):
@@ -101,6 +106,8 @@ class guiNTManager:
         self.rightIntakePublisher.set(rightIntake) # type: ignore
 
     def publishAlgae(self, algae:list[list[bool]]):
-        self.algaeL1.set(algae[0]) # type: ignore
-        self.algaeL2.set(algae[1]) # type: ignore
+        self.algaeL1Publisher.set(algae[0]) # type: ignore
+        self.algaeL2Publisher.set(algae[1]) # type: ignore
     
+    def getAlgae(self)->list[list[bool]]:
+        return [self.algaeL1Subscriber.get(), self.algaeL2Subscriber.get()] # type: ignore
